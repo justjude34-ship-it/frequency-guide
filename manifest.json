@@ -1,0 +1,17 @@
+{
+  "name": "Frequency Guide",
+  "short_name": "FreqGuide",
+  "description": "Interactive Solfeggio and brainwave guide. Load EquiSync tracks and learn the best use for each frequency.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [{
+    "src": "icon.svg",
+    "sizes": "any",
+    "type": "image/svg+xml",
+    "purpose": "any maskable"
+  }]
+}

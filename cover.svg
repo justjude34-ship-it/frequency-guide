@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" role="img" aria-label="Frequency Guide cover">
+  <rect width="1080" height="1350" fill="#000"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF2D55"/>
+      <stop offset="25%" stop-color="#FFCC00"/>
+      <stop offset="50%" stop-color="#00E676"/>
+      <stop offset="75%" stop-color="#00B0FF"/>
+      <stop offset="100%" stop-color="#E040FB"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="48%" r="42%">
+      <stop offset="0%" stop-color="#00E676" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#glow)"/>
+  <text x="540" y="210" text-anchor="middle" fill="#fff" font-family="Georgia, serif" font-size="78" letter-spacing="8">FREQUENCY</text>
+  <text x="540" y="290" text-anchor="middle" fill="url(#g)" font-family="Georgia, serif" font-size="78" letter-spacing="10">GUIDE</text>
+  <text x="540" y="360" text-anchor="middle" fill="#bbb" font-family="system-ui, sans-serif" font-size="28" letter-spacing="4">SOLFEGGIO AND BRAINWAVE COMPANION</text>
+  <path d="M80 640 C200 420 320 420 440 640 S680 860 800 640 S1000 420 1120 640" fill="none" stroke="#FF2D55" stroke-width="14" stroke-linecap="round"/>
+  <path d="M80 700 C200 510 320 510 440 700 S680 890 800 700 S1000 510 1120 700" fill="none" stroke="#00E676" stroke-width="11" stroke-linecap="round"/>
+  <path d="M80 760 C200 590 320 590 440 760 S680 930 800 760 S1000 590 1120 760" fill="none" stroke="#00B0FF" stroke-width="9" stroke-linecap="round"/>
+  <path d="M80 580 C200 390 320 390 440 580 S680 770 800 580 S1000 390 1120 580" fill="none" stroke="#E040FB" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="540" cy="680" r="16" fill="#FFD700"/>
+  <text x="540" y="1120" text-anchor="middle" fill="#888" font-family="system-ui, sans-serif" font-size="22" letter-spacing="3">CHOOSE · LOAD · LISTEN</text>
+  <text x="540" y="1180" text-anchor="middle" fill="#555" font-family="system-ui, sans-serif" font-size="18">Works with EquiSync tracks</text>
+</svg>
