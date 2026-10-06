@@ -8,11 +8,15 @@ Solfeggio and brainwave companion — sale-ready single HTML file.
 - Higher default volume (0.65) for accessibility
 - Inline hero (SVG data URI) — no external assets required
 - Shop cover: `cover.svg` (1200×630)
+- No EquiSync branding
 
 ## Open locally
 
 Open `frequency-guide.html` (or `index.html`) directly in any modern browser.
 
-## Deploy
+## Live
 
-Static hosting: publish `index.html` (and optional `cover.svg` / `icon.svg`).
+- GitHub Pages: https://justjude34-ship-it.github.io/frequency-guide/
+- Sale file: `frequency-guide.html`
+
+Note: `video/` in this repo is unrelated leftover media and is not used by the app.
