@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Frequency Guide">
+  <rect width="512" height="512" rx="96" fill="#000"/>
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#1a1a1a" stroke-width="18"/>
+  <path d="M56 256 C96 160 136 160 176 256 S256 352 296 256 S376 160 416 256 S496 352 536 256" fill="none" stroke="#FF2D55" stroke-width="16" stroke-linecap="round"/>
+  <path d="M56 292 C96 210 136 210 176 292 S256 374 296 292 S376 210 416 292 S496 374 536 292" fill="none" stroke="#00E676" stroke-width="12" stroke-linecap="round" opacity="0.85"/>
+  <path d="M56 220 C96 140 136 140 176 220 S256 300 296 220 S376 140 416 220 S496 300 536 220" fill="none" stroke="#00B0FF" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+  <circle cx="256" cy="256" r="18" fill="#FFD700"/>
+</svg>
