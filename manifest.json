@@ -1,7 +1,7 @@
 {
   "name": "Frequency Guide",
   "short_name": "FreqGuide",
-  "description": "Interactive Solfeggio and brainwave guide. Load EquiSync tracks and learn the best use for each frequency.",
+  "description": "Interactive Solfeggio and brainwave guide. Pure tones and educational frequency notes.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
