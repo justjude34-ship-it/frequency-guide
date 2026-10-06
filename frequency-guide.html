@@ -214,73 +214,124 @@ body { padding:0 0 96px; }
   };
 
   let audioCtx = null;
-  let current = null; // { osc, gain, hz, title, btn }
+  let masterGain = null;
+  let current = null; // { osc, gain, hz, title, btn, card }
   const volumeEl = document.getElementById('volume');
   const recEl = document.getElementById('recommendation');
   const npBar = document.getElementById('nowPlayingBar');
   const npHz = document.getElementById('npHz');
   const npTitle = document.getElementById('npTitle');
 
-  function ensureCtx() {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
+  function readVolume() {
+    const v = parseFloat(volumeEl.value);
+    return Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0.65;
+  }
+
+  // Chrome mobile: AudioContext starts suspended until resume() on a user gesture.
+  // Must await resume before starting oscillators or you get silence.
+  async function ensureCtx() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) throw new Error('Web Audio API not supported');
+    if (!audioCtx || audioCtx.state === 'closed') {
+      audioCtx = new AC();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = readVolume();
+      masterGain.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
     return audioCtx;
   }
 
   function stopTone() {
-    if (!current) return;
+    if (!current) {
+      npBar.classList.add('hidden');
+      return;
+    }
+    const prev = current;
+    current = null; // allow Play again immediately; do NOT close AudioContext
+    const { osc, gain, btn, card } = prev;
     try {
-      const { osc, gain, btn, card } = current;
       const now = audioCtx ? audioCtx.currentTime : 0;
-      if (gain) {
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(gain.gain.value, now);
-        gain.gain.linearRampToValueAtTime(0.0001, now + 0.08);
+      if (gain && audioCtx) {
+        try {
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(Math.max(gain.gain.value, 0.0001), now);
+          gain.gain.linearRampToValueAtTime(0.0001, now + 0.05);
+        } catch (e) {}
       }
       if (osc) {
-        try { osc.stop(now + 0.1); } catch (e) {}
-        try { osc.disconnect(); } catch (e) {}
+        try { osc.stop(now + 0.06); } catch (e) {
+          try { osc.stop(); } catch (e2) {}
+        }
       }
-      if (gain) try { gain.disconnect(); } catch (e) {}
-      if (btn) { btn.classList.remove('playing'); btn.textContent = 'Play'; }
-      if (card) card.classList.remove('playing');
+      setTimeout(function () {
+        try { if (osc) osc.disconnect(); } catch (e) {}
+        try { if (gain) gain.disconnect(); } catch (e) {}
+      }, 80);
     } catch (e) {}
-    current = null;
+    if (btn) { btn.classList.remove('playing'); btn.textContent = 'Play'; }
+    if (card) card.classList.remove('playing');
     npBar.classList.add('hidden');
   }
 
-  function playTone(item, btn, card) {
-    const ctx = ensureCtx();
-    const restarting = current && current.hz === item.hz;
+  async function playTone(item, btn, card) {
+    // Same card playing → toggle stop
+    if (current && current.hz === item.hz && current.btn === btn) {
+      stopTone();
+      return;
+    }
     stopTone();
-    if (restarting) return;
+
+    let ctx;
+    try {
+      ctx = await ensureCtx();
+    } catch (e) {
+      console.warn('Audio init failed', e);
+      return;
+    }
+    // Extra resume if still suspended after await (some mobile WebViews)
+    if (ctx.state !== 'running') {
+      try { await ctx.resume(); } catch (e) {}
+    }
+    if (!masterGain || masterGain.context !== ctx) {
+      masterGain = ctx.createGain();
+      masterGain.gain.value = readVolume();
+      masterGain.connect(ctx.destination);
+    }
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
-    // Brainwave-ish lows: keep audible by using the listed hz as a gentle tone
-    osc.frequency.value = Math.max(item.hz, 1);
-    const vol = parseFloat(volumeEl.value) || 0.65;
+    // Listed Hz as pure sine (brainwave lows may be felt more than heard)
+    const freq = Math.max(item.hz, 1);
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    // Volume lives on masterGain (slider); voice gain fades in to 1
+    masterGain.gain.setTargetAtTime(readVolume(), ctx.currentTime, 0.01);
     const now = ctx.currentTime;
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(vol * (item.hz < 20 ? 0.85 : 0.55), now + 0.12);
+    gain.gain.linearRampToValueAtTime(1, now + 0.1);
+
+    // Oscillator → gain → masterGain → destination
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(masterGain);
     osc.start(now);
+
     btn.classList.add('playing');
     btn.textContent = 'Playing…';
     card.classList.add('playing');
-    current = { osc, gain, hz:item.hz, title:item.title, btn, card };
+    current = { osc: osc, gain: gain, hz: item.hz, title: item.title, btn: btn, card: card };
     npHz.textContent = item.hz + ' Hz';
     npTitle.textContent = item.title;
     npBar.classList.remove('hidden');
   }
 
-  volumeEl.addEventListener('input', () => {
-    if (current && current.gain && audioCtx) {
-      const vol = parseFloat(volumeEl.value) || 0;
-      const scale = current.hz < 20 ? 0.85 : 0.55;
-      current.gain.gain.setTargetAtTime(vol * scale, audioCtx.currentTime, 0.05);
+  volumeEl.addEventListener('input', function () {
+    const vol = readVolume();
+    if (masterGain && audioCtx) {
+      masterGain.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.03);
     }
   });
 
@@ -299,7 +350,7 @@ body { padding:0 0 96px; }
     btn.type = 'button';
     btn.className = 'play-btn';
     btn.textContent = 'Play';
-    btn.addEventListener('click', () => playTone(item, btn, card));
+    btn.addEventListener('click', function () { playTone(item, btn, card); });
     card.appendChild(btn);
     grid.appendChild(card);
   }
